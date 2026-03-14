@@ -137,8 +137,41 @@ class Scheduler:
 
     
     #Chooses highest priority process instead of smallest length to determine next run
-    def priority(self):
-        raise NotImplementedError
+    # Assuming lower number is higher priority (e.g. 1 is higher priority than 2), can
+    # change later. Tie-breaking rule: lexicographically smallest PID.
+    # recall priority: heap_1 (highest priority process), heap_2 (inactive tasks)
+    def priority(self) -> List[GanttObject]:
+        ready_heap = []
+        inactive_heap = [(task.arrival, task.priority, task.pid) for task in self.jobs]
+        pid_task_dict = {task.pid: task for task in self.jobs}
+        heapq.heapify(inactive_heap)
+
+        time = 0
+        gantt_timeline: List[GanttObject] = []
+
+        while ready_heap or inactive_heap:
+            # Same as SJF, except Ready heap key: (priority, pid) — lower priority number
+            # wins, pid breaks ties lexicographically because Python compares strings naturally.
+            while inactive_heap and time >= inactive_heap[0][0]:
+                curr_arrival, curr_priority, curr_pid = heapq.heappop(inactive_heap)
+                heapq.heappush(ready_heap, (curr_priority, curr_pid, curr_arrival))
+            if not ready_heap:
+                time = inactive_heap[0][0] # fast forward
+                continue
+
+            task_priority, task_pid, task_arrival = heapq.heappop(ready_heap)
+            task = pid_task_dict[task_pid]
+
+            start_time = max(time, task_arrival)
+            end_time = start_time + task.burst  # non-preemptive
+
+            task.start_time = start_time
+            task.finish_time = end_time
+
+            gantt_timeline.append(GanttObject(task_pid, start_time, end_time))
+            time = end_time
+
+        return gantt_timeline
     
     #OPTIONAL to ensure full marks would probably be fun
     def MLFQ(self):
