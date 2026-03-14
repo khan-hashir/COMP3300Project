@@ -1,6 +1,7 @@
 from typing import List
 from task import Task
 from collections import deque
+import heapq
 
 class GanttObject:
     def __init__(self, pid, start, end = None):
@@ -79,8 +80,29 @@ class Scheduler:
         return gantt_timeline
 
 
-    def fifo(self):
-        raise NotImplementedError
+# recall fifo (first-in first out): basic heap -> upon task arrival time, non pre-emptive
+    def fifo(self) -> List[GanttObject]:
+        min_heap = [(task.arrival, task.burst, task.pid) for task in self.jobs]
+        pid_task_dict = {task.pid: task for task in self.jobs}
+        heapq.heapify(min_heap)
+
+        curr_time = 0
+        gantt_timeline: List[GanttObject] = []
+        while min_heap:
+            arrival_t, task_length, curr_task_pid = heapq.heappop(min_heap) # Popping off earliest task
+            start_time = max(curr_time, arrival_t)
+            end_time = start_time + task_length
+
+            task = pid_task_dict[curr_task_pid]  # Task Stats updating (whoever is implementing that, i can as well)
+            task.start_time = start_time
+            task.finish_time = end_time
+
+            gantt_timeline.append(GanttObject(curr_task_pid, start_time, end_time))  # timeline building
+            curr_time = end_time
+
+        return gantt_timeline
+
+        
 
     def sjf(self):
         raise NotImplementedError
