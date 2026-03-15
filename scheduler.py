@@ -82,14 +82,14 @@ class Scheduler:
 
 # recall fifo (first-in first out): basic heap -> upon task arrival time, non pre-emptive
     def fifo(self) -> List[GanttObject]:
-        min_heap = [(task.arrival, task.burst, task.pid) for task in self.jobs]
+        min_heap = [(task.arrival, task.pid, task.burst) for task in self.jobs]
         pid_task_dict = {task.pid: task for task in self.jobs}
         heapq.heapify(min_heap)
 
         curr_time = 0
         gantt_timeline: List[GanttObject] = []
         while min_heap:
-            arrival_t, task_length, curr_task_pid = heapq.heappop(min_heap) # Popping off earliest task
+            arrival_t, curr_task_pid, task_length = heapq.heappop(min_heap) # Popping off earliest task
             start_time = max(curr_time, arrival_t)
             end_time = start_time + task_length
 
@@ -116,12 +116,12 @@ class Scheduler:
         while ready_heap or inactive_heap:
             while inactive_heap and time >= inactive_heap[0][0]:  # soonest arrival time
                 curr_arrival, curr_burst, curr_pid = heapq.heappop(inactive_heap)
-                heapq.heappush(ready_heap, (curr_burst, curr_arrival, curr_pid)) # More context required on tie-breaking
+                heapq.heappush(ready_heap, (curr_burst, curr_pid, curr_arrival)) # More context required on tie-breaking
             if not ready_heap:
                 time = inactive_heap[0][0]  # fast foward
                 continue
 
-            task_length, task_arrival, task_pid  = heapq.heappop(ready_heap)
+            task_length, task_pid, task_arrival = heapq.heappop(ready_heap)
             start_time = max(time, task_arrival)
             end_time = start_time + task_length  # non-pre-emptive
 
