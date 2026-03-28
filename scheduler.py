@@ -19,6 +19,11 @@ class GanttObject:
     def __repr__(self):
         return f"GanttObject(pid={self.pid}, start={self.start}, end={self.end})"
 
+
+def gantt_to_dicts(gantt: List[GanttObject]) -> List[dict]:
+    return [segment.to_dict() for segment in gantt]
+
+
 class Scheduler:
     def __init__(self, policy, jobs, quantum=0):
         self.policy: str = policy
