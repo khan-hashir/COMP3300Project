@@ -1,8 +1,20 @@
 from __future__ import annotations
 
+from decimal import ROUND_HALF_UP, Decimal
 from typing import List
 
 from task import Task
+
+
+_AVG_QUANT = Decimal("0.01")
+
+def _mean_two_decimals(total: int, count: int) -> float:
+    if count <= 0:
+        raise ValueError("count must be positive")
+    q = (Decimal(total) / Decimal(count)).quantize(
+        _AVG_QUANT, rounding=ROUND_HALF_UP
+    )
+    return float(q)
 
 
 class ScheduleMetrics:
@@ -26,8 +38,8 @@ class ScheduleMetrics:
             waiting[task.pid] = task.waiting_time()
 
         n = len(ordered)
-        avg_turnaround = round(sum(turnaround.values()) / n, 2)
-        avg_waiting = round(sum(waiting.values()) / n, 2)
+        avg_turnaround = _mean_two_decimals(sum(turnaround.values()), n)
+        avg_waiting = _mean_two_decimals(sum(waiting.values()), n)
 
         return {
             "turnaround": turnaround,
