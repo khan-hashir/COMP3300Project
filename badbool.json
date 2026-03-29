@@ -1,5 +1,0 @@
-{
-    "policy":"FIFO",
-
-    "jobs":[{"pid":"A","arrival":true,"burst":1,"priority":1}]
-}
