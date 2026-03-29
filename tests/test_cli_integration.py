@@ -1,13 +1,6 @@
 import json
-import subprocess
-import sys
-from pathlib import Path
 
 import pytest
-
-_ROOT = Path(__file__).resolve().parents[1]
-_MAIN = _ROOT / "main.py"
-_FIXTURES = _ROOT / "tests" / "fixtures"
 
 _EXPECTED_BY_FIXTURE = {
     "fifo.json": {
@@ -75,16 +68,12 @@ _EXPECTED_BY_FIXTURE = {
 
 
 @pytest.mark.parametrize("fixture_name", ["fifo.json", "sjf.json", "priority.json", "rr.json"])
-def test_main_cli_outputs_expected_json_for_fixtures(fixture_name: str):
-    fixture_path = _FIXTURES / fixture_name
-    completed = subprocess.run(
-        [sys.executable, str(_MAIN), str(fixture_path)],
-        capture_output=True,
-        text=True,
-        check=False,
-    )
+def test_main_cli_outputs_expected_json_for_fixtures(
+    fixture_name: str, fixtures_dir, run_main_cli
+):
+    fixture_path = fixtures_dir / fixture_name
+    completed = run_main_cli(fixture_path)
     assert completed.returncode == 0, completed.stderr
     assert completed.stderr == ""
     actual = json.loads(completed.stdout)
     assert actual == _EXPECTED_BY_FIXTURE[fixture_name]
-
