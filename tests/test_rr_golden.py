@@ -57,6 +57,32 @@ def test_rr_quantum_slicing_keeps_segments_within_quantum():
         assert 1 <= (seg["end"] - seg["start"]) <= 2
 
 
+def test_rr_equal_arrival_uses_lexicographic_pid_tiebreak():
+    """Equal arrival: ready queue follows PID order; B before A in JSON disproves list-order scheduling."""
+    raw = {
+        "policy": "RR",
+        "quantum": 2,
+        "jobs": [
+            {"pid": "B", "arrival": 0, "burst": 4, "priority": 1},
+            {"pid": "A", "arrival": 0, "burst": 4, "priority": 1},
+        ],
+    }
+    data = normalize_input(raw)
+    validate_input(data)
+    scheduler = parse_tasks(data)
+    out = build_output(scheduler, scheduler.schedule())
+    assert out["gantt"] == [
+        {"pid": "A", "start": 0, "end": 2},
+        {"pid": "B", "start": 2, "end": 4},
+        {"pid": "A", "start": 4, "end": 6},
+        {"pid": "B", "start": 6, "end": 8},
+    ]
+    assert out["metrics"]["turnaround"] == {"A": 6, "B": 8}
+    assert out["metrics"]["waiting"] == {"A": 2, "B": 4}
+    assert out["metrics"]["avg_turnaround"] == 7.0
+    assert out["metrics"]["avg_waiting"] == 3.0
+
+
 @pytest.mark.parametrize("policy_spacing", ["RR", "  rr  "])
 def test_rr_policy_normalization(policy_spacing: str):
     raw = {
