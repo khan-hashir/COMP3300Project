@@ -18,6 +18,22 @@ import pytest
             },
             "Duplicate pid",
         ),
+        (
+            {
+                "policy": "FIFO",
+                "jobs": [
+                    {"pid": "A", "arrival": True, "burst": 1, "priority": 1},
+                ],
+            },
+            "jobs[0].arrival must be an integer (got boolean)",
+        ),
+        (
+            {
+                "policy": "FCFS",
+                "jobs": [{"pid": "A", "arrival": 0, "burst": 1, "priority": 1}],
+            },
+            "Unsupported policy",
+        ),
     ],
 )
 def test_invalid_inputs_exit_nonzero_and_emit_stderr(

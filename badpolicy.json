@@ -1,0 +1,5 @@
+{
+    "policy":"FCFS",
+    
+    "jobs":[{"pid":"A","arrival":0,"burst":1,"priority":1}]
+}
