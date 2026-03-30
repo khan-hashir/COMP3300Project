@@ -9,13 +9,23 @@ from task import Task
 
 
 def format_schedule_json(data: dict) -> str:
-
-    return json.dumps(
-        data,
-        separators=(",", ":"),
-        sort_keys=False,
-        allow_nan=False,
-    )
+    lines = ["{"]
+    lines.append(f'  "policy": {json.dumps(data["policy"], allow_nan=False)},')
+    lines.append('  "gantt": [')
+    gantt = data["gantt"]
+    for i, seg in enumerate(gantt):
+        tail = "," if i < len(gantt) - 1 else ""
+        lines.append(f"    {json.dumps(seg, allow_nan=False)}{tail}")
+    lines.append("  ],")
+    m = data["metrics"]
+    lines.append('  "metrics": {')
+    lines.append(f'    "turnaround": {json.dumps(m["turnaround"], allow_nan=False)},')
+    lines.append(f'    "waiting": {json.dumps(m["waiting"], allow_nan=False)},')
+    lines.append(f'    "avg_turnaround": {json.dumps(m["avg_turnaround"], allow_nan=False)},')
+    lines.append(f'    "avg_waiting": {json.dumps(m["avg_waiting"], allow_nan=False)}')
+    lines.append("  }")
+    lines.append("}")
+    return "\n".join(lines) + "\n"
 
 
 def parse_tasks(json_load) -> Scheduler:

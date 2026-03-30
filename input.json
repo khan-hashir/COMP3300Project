@@ -2,23 +2,8 @@
   "policy": "RR",
   "quantum": 2,
   "jobs": [
-    {
-      "pid": "A",
-      "arrival": 0,
-      "burst": 6,
-      "priority": 3
-    },
-    {
-      "pid": "B",
-      "arrival": 4,
-      "burst": 4,
-      "priority": 1
-    },
-    {
-      "pid": "C",
-      "arrival": 6,
-      "burst": 3,
-      "priority": 2
-    }
+    {"pid": "A", "arrival": 0, "burst": 6, "priority": 3},
+    {"pid": "B", "arrival": 0, "burst": 2, "priority": 1},
+    {"pid": "C", "arrival": 1, "burst": 3, "priority": 2}
   ]
 }
